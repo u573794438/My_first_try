@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const passport = require('passport');
+
 const Review = require('../models/review.model');
 const User = require('../models/user.model');
 
