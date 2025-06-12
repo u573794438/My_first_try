@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   mongodb:
@@ -46,7 +45,7 @@ services:
     container_name: performance-review-frontend
     restart: always
     ports:
-      - "3000:80"
+      - "5001:80"
     depends_on:
       - backend
     networks:

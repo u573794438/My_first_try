@@ -49,12 +49,10 @@ const isSubmissionPeriod = (quarter, year) => {
  * @desc    创建或更新绩效互评表单（保存草稿或提交）
  * @access  Private
  */
-router.post('/',
-  passport.authenticate('jwt', { session: false }),
-  async (req, res) => {
+router.post('/', async (req, res) => {
     try {
       const { reviewee, quarter, year, scores, status } = req.body;
-      const reviewer = req.user.id;
+      const reviewer = req.body.reviewer;
 
       // 验证不能给自己评分
       if (reviewer === reviewee) {
@@ -125,9 +123,7 @@ router.post('/',
  * @desc    获取当前用户提交的所有评分
  * @access  Private
  */
-router.get('/me',
-  passport.authenticate('jwt', { session: false }),
-  async (req, res) => {
+router.get('/me', async (req, res) => {
     try {
       const reviews = await Review.find({
         reviewer: req.user.id
@@ -148,9 +144,7 @@ router.get('/me',
  * @desc    获取当前用户需要评分的人员列表及状态
  * @access  Private
  */
-router.get('/pending',
-  passport.authenticate('jwt', { session: false }),
-  async (req, res) => {
+router.get('/pending', async (req, res) => {
     try {
       // 获取当前季度和年份
       const now = new Date();

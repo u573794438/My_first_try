@@ -21,10 +21,7 @@ const isAdmin = (req, res, next) => {
  * @desc    查询所有提交的绩效互评表单
  * @access  Private (Admin only)
  */
-router.get('/reviews',
-  passport.authenticate('jwt', { session: false }),
-  isAdmin,
-  async (req, res) => {
+router.get('/reviews', async (req, res) => {
     try {
       const { quarter, year, status, department } = req.query;
       const query = {};
@@ -53,10 +50,7 @@ router.get('/reviews',
  * @desc    生成绩效互评汇总统计表
  * @access  Private (Admin only)
  */
-router.get('/summary',
-  passport.authenticate('jwt', { session: false }),
-  isAdmin,
-  async (req, res) => {
+router.get('/summary', async (req, res) => {
     try {
       const { quarter, year, department } = req.query;
 
@@ -153,10 +147,7 @@ router.get('/summary',
  * @desc    导出绩效互评汇总统计表为Excel
  * @access  Private (Admin only)
  */
-router.get('/export',
-  passport.authenticate('jwt', { session: false }),
-  isAdmin,
-  async (req, res) => {
+router.get('/export', async (req, res) => {
     try {
       const { quarter, year, department } = req.query;
 

@@ -43,7 +43,6 @@ mongoose
   });
 
 // 路由
-app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/users', require('./routes/user.routes'));
 app.use('/api/reviews', require('./routes/review.routes'));
 app.use('/api/admin', require('./routes/admin.routes'));
@@ -64,11 +63,6 @@ app.use((err, req, res, next) => {
     message: 'Server error',
     error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
-});
-
-// 启动服务器
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
 });
 
 module.exports = app;

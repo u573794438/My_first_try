@@ -30,16 +30,10 @@ const userSchema = new Schema({
     enum: Object.values(UserRole),
     default: UserRole.EMPLOYEE
   },
-  wechatId: {
-    type: String,
-    unique: true,
-    sparse: true
-  },
   isActive: {
     type: Boolean,
     default: true
   },
-  lastLogin: Date,
   createdAt: {
     type: Date,
     default: Date.now

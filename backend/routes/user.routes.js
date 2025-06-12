@@ -16,10 +16,7 @@ const isAdmin = (req, res, next) => {
  * @desc    获取所有用户列表
  * @access  Private (Admin only)
  */
-router.get('/',
-  passport.authenticate('jwt', { session: false }),
-  isAdmin,
-  async (req, res) => {
+router.get('/', async (req, res) => {
     try {
       const users = await User.find().select('-__v');
       res.json({ success: true, count: users.length, data: users });
@@ -35,10 +32,7 @@ router.get('/',
  * @desc    创建新用户
  * @access  Private (Admin only)
  */
-router.post('/',
-  passport.authenticate('jwt', { session: false }),
-  isAdmin,
-  async (req, res) => {
+router.post('/', async (req, res) => {
     try {
       const { name, employeeId, department, role, wechatId } = req.body;
 
@@ -76,10 +70,7 @@ router.post('/',
  * @desc    更新用户信息
  * @access  Private (Admin only)
  */
-router.put('/:id',
-  passport.authenticate('jwt', { session: false }),
-  isAdmin,
-  async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
       const { name, department, role, wechatId, isActive } = req.body;
 
@@ -111,9 +102,7 @@ router.put('/:id',
  * @desc    获取所有活跃员工（用于互评列表）
  * @access  Private
  */
-router.get('/active',
-  passport.authenticate('jwt', { session: false }),
-  async (req, res) => {
+router.get('/active', async (req, res) => {
     try {
       const users = await User.find({
         isActive: true,
