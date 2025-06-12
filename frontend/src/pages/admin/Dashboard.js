@@ -66,8 +66,40 @@ const AdminDashboard = () => {
           >
             <Statistic
               value={stats.totalUsers}
+// 获取系统统计数据
+const fetchSystemStats = async () => {
+  try {
+    setLoading(true);
+    // 获取用户统计
+    const userResponse = await axios.get('/api/users');
+    // 获取评分统计
+    const reviewResponse = await axios.get('/api/admin/reviews');
+
+    if (userResponse.data.success && reviewResponse.data.success) {
+      const totalUsers = userResponse.data.count;
+      const activeUsers = userResponse.data.data.filter(u => u.isActive).length;
+      const totalReviews = reviewResponse.data.count;
+      const submittedReviews = reviewResponse.data.data.filter(r => r.status === 'submitted').length;
+      const pendingReviews = totalReviews - submittedReviews;
+
+      setStats({
+        totalUsers,
+        activeUsers,
+        pendingReviews,
+        submittedReviews
+      });
+    } else {
+      message.error('获取系统统计失败');
+    }
+  } catch (error) {
+    console.error('获取系统统计失败:', error);
+    message.error('获取系统统计失败');
+  } finally {
+    setLoading(false);
+  }
+};
               precision={0}
-              icon={<TeamOutlined style={{ color: '#1890ff' }} />
+              icon={<TeamOutlined style={{ color: '#1890ff' }} />}
             }
           </Card>
         </Col>

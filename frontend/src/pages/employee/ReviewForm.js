@@ -1,9 +1,101 @@
+// 获取被评人信息
+const fetchRevieweeInfo = async () => {
+  try {
+    setLoading(true);
+    const response = await axios.get(`/api/users/${revieweeId}`);
+    if (response.data.success) {
+      setReviewee(response.data.data);
+    }
+  } catch (error) {
+    console.error('获取被评人信息失败:', error);
+    message.error('获取被评人信息失败');
+    navigate('/');
+  }
+};
+
+// 获取已保存的评分
+const fetchReviewData = async () => {
+  if (!reviewId) return;
+  try {
+    setLoading(true);
+    const response = await axios.get(`/api/reviews/${reviewId}`);
+    if (response.data.success) {
+      const review = response.data.data;
+      form.setFieldsValue({
+        jobPerformance: review.scores.jobPerformance,
+        additionalAchievements: review.scores.additionalAchievements,
+        compliance: review.scores.compliance,
+        teamwork: review.scores.teamwork,
+        diligence: review.scores.diligence,
+      });
+    }
+  } catch (error) {
+    console.error('获取评分数据失败:', error);
+    message.error('获取评分数据失败');
+  }
+};
+
+// 保存草稿
+const handleSaveDraft = async () => {
+  try {
+    const values = await form.validateFields();
+    setLoading(true);
+
+    const response = await axios.post('/api/reviews', {
+      reviewee: revieweeId,
+      quarter: period.quarter,
+      year: period.year,
+      scores: values,
+      status: 'draft'
+    });
+
+    if (response.data.success) {
+      message.success('草稿保存成功');
+    }
+  } catch (error) {
+    console.error('保存草稿失败:', error);
+    message.error(error.message || '保存草稿失败，请重试');
+  } finally {
+    setLoading(false);
+  }
+};
+
+// 提交评分
+const handleSubmit = async () => {
+  if (!isSubmissionPeriod) {
+    message.warning('不在提交时间段内，只能在每季度最后一周至下季度第二周之间提交');
+    return;
+  }
+
+  try {
+    const values = await form.validateFields();
+    setLoading(true);
+
+    const response = await axios.post('/api/reviews', {
+      reviewee: revieweeId,
+      quarter: period.quarter,
+      year: period.year,
+      scores: values,
+      status: 'submitted'
+    });
+
+    if (response.data.success) {
+      message.success('评分提交成功');
+      navigate('/');
+    }
+  } catch (error) {
+    console.error('提交评分失败:', error);
+    message.error(error.message || '提交评分失败，请重试');
+  } finally {
+    setLoading(false);
+  }
+};
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Form, InputNumber, Button, Card, Typography, message, Spin, Divider, Space, Alert } from 'antd';
 import { SaveOutlined, CheckOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import axios from '../../utils/axios';
-import Review from '../../models/review.model';
+
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;

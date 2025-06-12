@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Typography, Form, Select, Card, Spin, message, Tag, Space, Divider } from 'antd';
 import { DownloadOutlined, ReloadOutlined, BarChartOutlined } from '@ant-design/icons';
 import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Title as ChartTitle, Tooltip, Legend } from 'chart.js';
 import axios from '../../utils/axios';
 
 // 注册Chart.js组件
-ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, ChartTitle, Tooltip, Legend);
 
 const { Title, Text } = Typography;
 const { Option } = Select;
