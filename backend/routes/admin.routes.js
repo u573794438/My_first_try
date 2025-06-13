@@ -7,21 +7,15 @@ const fs = require('fs');
 const path = require('path');
 const User = require('../models/user.model');
 const Review = require('../models/review.model');
+const { auth, isAdmin } = require('../middleware/auth.middleware');
 
-// 权限检查中间件
-const isAdmin = (req, res, next) => {
-  if (req.user.role !== User.UserRole.ADMIN) {
-    return res.status(403).json({ success: false, message: '没有管理员权限' });
-  }
-  next();
-};
-
+// 已从auth.middleware导入权限检查中间件
 /**
  * @route   GET /api/admin/reviews
  * @desc    查询所有提交的绩效互评表单
  * @access  Private (Admin only)
  */
-router.get('/reviews', async (req, res) => {
+router.get('/reviews', auth, isAdmin, async (req, res) => {
     try {
       const { quarter, year, status, department } = req.query;
       const query = {};
@@ -50,7 +44,7 @@ router.get('/reviews', async (req, res) => {
  * @desc    生成绩效互评汇总统计表
  * @access  Private (Admin only)
  */
-router.get('/summary', async (req, res) => {
+router.get('/summary', auth, isAdmin, async (req, res) => {
     try {
       const { quarter, year, department } = req.query;
 
@@ -147,7 +141,7 @@ router.get('/summary', async (req, res) => {
  * @desc    导出绩效互评汇总统计表为Excel
  * @access  Private (Admin only)
  */
-router.get('/export', async (req, res) => {
+router.get('/export', auth, isAdmin, async (req, res) => {
     try {
       const { quarter, year, department } = req.query;
 

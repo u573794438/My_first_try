@@ -18,11 +18,35 @@ const { Header, Sider, Content } = Layout;
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const currentUser = { role: 'admin', name: '管理员' }; // 模拟管理员用户
-  const isAuthenticated = true;
-  const logout = () => {};
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setCurrentUser(null);
+    setIsAuthenticated(false);
+    navigate('/login');
+  };
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    // 检查localStorage中的token和用户信息
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (token && user) {
+      setCurrentUser(user);
+      setIsAuthenticated(true);
+    } else {
+      setCurrentUser(null);
+      setIsAuthenticated(false);
+      // 如果当前路径是管理页面且未认证，则重定向到登录页
+      if (location.pathname.startsWith('/admin')) {
+        navigate('/login');
+      }
+    }
+  }, []);
 
   // 用户菜单
   const userMenuItems = [
@@ -98,7 +122,7 @@ const App = () => {
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[location.pathname.split('/')[1] === 'admin' ? '/admin' : location.pathname]}
+          selectedKeys={[location.pathname]}
           items={getNavMenuItems()}
           onClick={({ key }) => {
             navigate(key);
@@ -111,6 +135,9 @@ const App = () => {
             {currentUser?.name} ({currentUser?.role === 'admin' ? '管理员' : '员工'})
           </div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Button type="text" icon={<LogoutOutlined />} onClick={logout} style={{ marginRight: 16 }}>
+              退出登录
+            </Button>
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
               <Button type="text" size="large" icon={<Avatar icon={<UserOutlined />} />} />
             </Dropdown>

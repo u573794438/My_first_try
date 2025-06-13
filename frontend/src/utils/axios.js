@@ -13,7 +13,15 @@ const instance = axios.create({
 
 // 请求拦截器
 instance.interceptors.request.use(
-  (config) => config,
+  (config) => {
+    // 从localStorage获取token
+    const token = localStorage.getItem('token');
+    // 如果token存在，则添加到请求头
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
   (error) => {
     // 请求错误处理
     console.error('Request error:', error);

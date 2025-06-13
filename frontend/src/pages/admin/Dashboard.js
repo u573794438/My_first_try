@@ -20,16 +20,24 @@ const AdminDashboard = () => {
     const fetchSystemStats = async () => {
       setLoading(true);
       try {
-        const userResponse = await axios.get('/api/users');
-        if (userResponse.data.success) {
-          setStats({
-            totalUsers: userResponse.data.count,
-            activeUsers: userResponse.data.data.filter(u => u.isActive).length
+        // 获取当前季度和年份
+        const now = new Date();
+        const year = now.getFullYear();
+        const quarter = Math.floor((now.getMonth() / 3)) + 1;
+
+        const response = await axios.get('/api/admin/summary', {
+          params: { year, quarter }
+        });
+
+        if (response.success) {
+          setStats({ 
+            totalUsers: response.count,
+            activeUsers: response.data.length
           });
         }
       } catch (error) {
         console.error('获取统计数据失败:', error);
-        message.error('获取统计数据失败');
+        message.error('获取统计数据失败: ' + (error.response?.data?.message || error.message));
       } finally {
         setLoading(false);
       }
@@ -43,6 +51,24 @@ const AdminDashboard = () => {
       <Spin spinning={loading} tip="加载中...">
         <Title level={2}>管理控制台</Title>
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <Col xs={12} sm={6} lg={6} xl={6}>
+            <Card>
+              <Statistic
+                title="总用户数"
+                value={stats.totalUsers}
+                prefix={<TeamOutlined />}
+              />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6} lg={6} xl={6}>
+            <Card>
+              <Statistic
+                title="活跃用户"
+                value={stats.activeUsers}
+                prefix={<DashboardOutlined />}
+              />
+            </Card>
+          </Col>
         </Row>
         {/* 其他仪表盘内容 */}
       </Spin>
