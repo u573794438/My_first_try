@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
-import jwtDecode from 'jwt-decode';
+
 import 'antd/dist/reset.css';
 import App from './App';
-import Login from './pages/Login';
+
 import EmployeeDashboard from './pages/employee/Dashboard';
 import ReviewForm from './pages/employee/ReviewForm';
 import AdminDashboard from './pages/admin/Dashboard';
@@ -26,11 +26,7 @@ const RootApp = () => (
             <Route path="review/:revieweeId?" element={<ReviewForm />} />
 
             {/* 管理员路由 */}
-            <Route path="admin" element={
-              <AdminRoute>
-                <AdminDashboard />
-              </AdminRoute>
-            }>
+            <Route path="admin" element={<AdminDashboard />}>
               <Route index element={<Navigate to="summary" replace />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="reviews" element={<ReviewQuery />} />
@@ -41,7 +37,7 @@ const RootApp = () => (
         </Routes>
       </Router>
     </ConfigProvider>
-  </AuthProvider>
+
 );
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
