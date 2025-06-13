@@ -1,22 +1,18 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
-const passport = require('passport');
-const User = require('../models/user.model');
 
-// 权限检查中间件
-const isAdmin = (req, res, next) => {
-  if (req.user.role !== User.UserRole.ADMIN) {
-    return res.status(403).json({ success: false, message: '没有管理员权限' });
-  }
-  next();
-};
+const User = require('../models/user.model');
+const { auth, isAdmin } = require('../middleware/auth.middleware');
+
+// 已从auth.middleware导入权限检查中间件
 
 /**
  * @route   GET /api/users
  * @desc    获取所有用户列表
  * @access  Private (Admin only)
  */
-router.get('/', async (req, res) => {
+router.get('/', auth, isAdmin, async (req, res) => {
     try {
       const users = await User.find().select('-__v');
       res.json({ success: true, count: users.length, data: users });
@@ -32,7 +28,7 @@ router.get('/', async (req, res) => {
  * @desc    创建新用户
  * @access  Private (Admin only)
  */
-router.post('/', async (req, res) => {
+router.post('/', auth, isAdmin, async (req, res) => {
     try {
       const { name, employeeId, department, role, wechatId } = req.body;
 
@@ -70,7 +66,7 @@ router.post('/', async (req, res) => {
  * @desc    更新用户信息
  * @access  Private (Admin only)
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, isAdmin, async (req, res) => {
     try {
       const { name, department, role, wechatId, isActive } = req.body;
 
@@ -102,7 +98,7 @@ router.put('/:id', async (req, res) => {
  * @desc    获取所有活跃员工（用于互评列表）
  * @access  Private
  */
-router.get('/active', async (req, res) => {
+router.get('/active', auth, async (req, res) => {
     try {
       const users = await User.find({
         isActive: true,
@@ -115,5 +111,53 @@ router.get('/active', async (req, res) => {
     }
   }
 );
+
+/**
+ * @route   POST /api/users/login
+ * @desc    用户登录
+ * @access  Public
+ */
+router.post('/login', async (req, res) => {
+  try {
+    const { employeeId, password } = req.body;
+
+    if (!employeeId || !password) {
+      return res.status(400).json({ success: false, message: '请提供工号和密码' });
+    }
+
+    const user = await User.findOne({ employeeId });
+    if (!user) {
+      return res.status(401).json({ success: false, message: '工号或密码不正确' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: '工号或密码不正确' });
+    }
+
+    // 生成JWT令牌
+const token = jwt.sign(
+  { id: user._id, role: user.role },
+  process.env.JWT_SECRET || 'your_jwt_secret_key',
+  { expiresIn: '1d' }
+);
+
+res.json({ 
+  success: true, 
+  token,
+  data: {
+    user: {
+      id: user._id,
+      name: user.name,
+      employeeId: user.employeeId,
+      role: user.role
+    }
+  } 
+});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: '服务器错误' });
+  }
+});
 
 module.exports = router;

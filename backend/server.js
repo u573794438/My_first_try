@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const User = require('./models/user.model');
 
 // 加载环境变量
 dotenv.config();
@@ -24,6 +25,33 @@ mongoose
   })
   .then(() => {
     console.log('MongoDB连接成功');
+
+    // 创建默认管理员用户
+    User.findOne({ employeeId: 'hradmin' })
+      .then(existingUser => {
+        if (!existingUser) {
+          const adminUser = new User({
+            name: 'HR Admin',
+            employeeId: 'hradmin',
+            password: '771117',
+            department: 'HR',
+            role: User.UserRole.ADMIN,
+            isActive: true
+          });
+          return adminUser.save();
+        }
+        return null;
+      })
+      .then(newUser => {
+        if (newUser) {
+          console.log('默认管理员用户创建成功');
+        } else {
+          console.log('管理员用户已存在');
+        }
+      })
+      .catch(err => {
+        console.error('创建管理员用户错误:', err);
+      });
 
     // 启动服务器
     const PORT = process.env.PORT || 5000;

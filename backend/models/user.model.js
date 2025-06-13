@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
 
 // 用户角色枚举
@@ -18,6 +19,11 @@ const userSchema = new Schema({
     type: String,
     required: true,
     unique: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: true,
     trim: true
   },
   department: {
@@ -50,8 +56,25 @@ userSchema.pre('save', function(next) {
   next();
 });
 
+// 密码哈希
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 // 添加静态方法
 userSchema.statics.UserRole = UserRole;
+
+// 密码验证方法
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;
