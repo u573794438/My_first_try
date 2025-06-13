@@ -6,15 +6,44 @@ import axios from '../../utils/axios';
 
 const { Title, Text } = Typography;
 
-const AdminDashboard = () => {
-  const [loading, setLoading] = useState(true);
+  const AdminDashboard = () => {
+      const [loading, setLoading] = useState(true);
+      const [stats, setStats] = useState({
+        totalUsers: 0,
+        activeUsers: 0,
+        totalReviews: 0,
+        completedReviews: 0
+      });
+      const navigate = useNavigate();
 
-  // 获取系统统计数据
-  const fetchSystemStats = async () => {
-      try {
-        setLoading(true);
-        const userResponse = await axios.get('/api/users');
-        const reviewResponse = await axios.get('/api/admin/reviews');
+      // 获取系统统计数据
+      const fetchSystemStats = async () => {
+        try {
+          setLoading(true);
+          const userResponse = await axios.get('/api/users');
+          const reviewResponse = await axios.get('/api/admin/reviews');
+
+          if (userResponse.data.success && reviewResponse.data.success) {
+            setStats({
+              totalUsers: userResponse.data.count,
+              activeUsers: userResponse.data.data.filter(u => u.isActive).length,
+              totalReviews: reviewResponse.data.count,
+              completedReviews: reviewResponse.data.data.filter(r => r.status === 'completed').length
+            });
+          }
+        } catch (error) {
+          console.error('获取统计数据失败:', error);
+          message.error('获取统计数据失败');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="dashboard-container">
+          <Spin spinning={loading} tip="加载中...">
+            <Title level={2}>管理控制台</Title>
+            <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
 
         if (userResponse.data.success && reviewResponse.data.success) {
           setStats({
@@ -32,18 +61,7 @@ const AdminDashboard = () => {
       }
     };
 
-    return (
-  const [stats, setStats] = useState({
-    totalUsers: 0,
-    activeUsers: 0,
-    pendingReviews: 0,
-    submittedReviews: 0,
-  });
-  const navigate = useNavigate();
-
-  // 获取系统统计数据
-  const fetchSystemStats = async () => {
-    try {
+  return (
       setLoading(true);
       // 获取用户统计
       const userResponse = await axios.get('/api/users');
