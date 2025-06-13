@@ -10,38 +10,19 @@ import {
   SettingOutlined
 } from '@ant-design/icons';
 import { useNavigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';
+
 import axios from './utils/axios';
 
 const { Header, Sider, Content } = Layout;
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
-  const { isAuthenticated, user, logout } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const currentUser = { role: 'admin', name: '管理员' }; // 模拟管理员用户
+  const isAuthenticated = true;
+  const logout = () => {};
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      setCurrentUser(user);
-      setLoading(false);
-    }
-  }, [isAuthenticated, user]);
-
-  // 处理登出
-  const handleLogout = async () => {
-    try {
-      await axios.post('/api/auth/logout');
-      logout();
-      navigate('/login');
-      message.success('登出成功');
-    } catch (error) {
-      message.error('登出失败，请重试');
-      console.error('Logout error:', error);
-    }
-  };
 
   // 用户菜单
   const userMenuItems = [
@@ -50,12 +31,7 @@ const App = () => {
       icon: <UserOutlined />,
       label: '个人信息',
     },
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: '退出登录',
-      onClick: handleLogout
-    },
+
   ];
 
   // 导航菜单 - 根据用户角色显示不同菜单

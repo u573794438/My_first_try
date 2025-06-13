@@ -66,6 +66,8 @@ const AdminDashboard = () => {
           >
             <Statistic
               value={stats.totalUsers}
+            />
+          </Card>
 // 获取系统统计数据
 const fetchSystemStats = async () => {
   try {

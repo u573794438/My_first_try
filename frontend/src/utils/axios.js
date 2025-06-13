@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { message } from 'antd';
-import { useAuth } from '../contexts/AuthContext';
+
 
 // 创建axios实例
 const instance = axios.create({
@@ -13,14 +13,7 @@ const instance = axios.create({
 
 // 请求拦截器
 instance.interceptors.request.use(
-  (config) => {
-    // 从localStorage获取token
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
+  (config) => config,
   (error) => {
     // 请求错误处理
     console.error('Request error:', error);
@@ -38,14 +31,7 @@ instance.interceptors.response.use(
     // 响应错误处理
     const { response } = error;
 
-    // 未认证，token过期或无效
-    if (response && response.status === 401) {
-      // 清除本地存储并重定向到登录页
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-      message.error('登录已过期，请重新登录');
-    } else if (response && response.status === 403) {
+    if (response && response.status === 403) {
       message.error('没有权限执行此操作');
     } else if (response && response.status === 404) {
       message.error('请求的资源不存在');
