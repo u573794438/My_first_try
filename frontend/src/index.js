@@ -14,12 +14,14 @@ import UserManagement from './pages/admin/UserManagement';
 import ReviewQuery from './pages/admin/ReviewQuery';
 import SummaryStatistics from './pages/admin/SummaryStatistics';
 import NotFound from './pages/NotFound';
+import Login from './pages/Login';
 
 
 const RootApp = () => (
   <ConfigProvider locale={zhCN}>
     <Router>
       <Routes>
+        <Route path="login" element={<Login />} />
         <Route path="/" element={<App />}>
             {/* 员工路由 */}
             <Route index element={<EmployeeDashboard />} />
@@ -33,6 +35,7 @@ const RootApp = () => (
               <Route path="summary" element={<SummaryStatistics />} />
             </Route>
           </Route>
+          <Route path="login" element={<Login />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
